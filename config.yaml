@@ -1,0 +1,11 @@
+padding: "10%"
+aspect-ratio: "3:2"
+shader: shades.yaml
+
+# An example of progress images would be "{datetime}/{planet}"
+filename: "{datetime}/{surfaceName}"
+
+auto-update-server: True # Always pull the newest server from factorio.com
+
+#factorio-save-path: ~/.factorio/saves/Space Age.zip # Location of the save file that will be used
+#backgrounds-folder: ~/Background # Output images will be moved to this folder, if there are matching names they will be overridden
