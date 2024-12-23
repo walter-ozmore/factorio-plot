@@ -1,0 +1,19 @@
+background-color: "#17AE83"
+
+group:
+  machines:
+    names: [assembling-machine, chemical-plant, inserter, roboport, steam-turbine, radar, lab, electric-furnace, electric-mining-drill, pumpjack, rocket-silo]
+    func: IN
+  short-transport:
+    names: [belt, splitter, underground, pipe]
+    func: IN
+
+defaults:
+  - group: machines
+    color: "#F5E6C5"
+  - group: short-transport
+    color: "#15594D"
+  - names: [rail]
+    func: IN
+    color: "#CEE7EC"
+

@@ -1,0 +1,9 @@
+# A color picker for linux I keep in the project folder
+factorio.tar.xz
+info.md
+
+/example-images
+/venv
+/factorio
+/factorio-save/*
+/images/*

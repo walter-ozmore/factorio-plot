@@ -1,0 +1,30 @@
+# Stores default info about the shape of given objects, this is overridden by the style file
+# Ex: Roboports being 4x4
+
+- names: [belt, splitter, underground]
+  func: IN
+  flags: ["center"]
+
+- names: [rail, stone-furnace, steel-furnace, recycler]
+  func: IN
+  size: [2, 2]
+
+- names: [assembling-machine, electric-furnace, electric-mining-drill, chemical-plant]
+  func: IN
+  size: [3, 3]
+  flags: ["center"]
+
+- names: [assembling-machine, electric-furnace, electric-mining-drill, lab, pumpjack]
+  func: IN
+  size: [3, 3]
+  flags: ["center"]
+
+- names: [electric-mining-drill]
+  size: [3, 3]
+
+- names: [cliff, big-electric-pole, substation]
+  func: IN
+  size: [2, 2]
+
+- names: [roboport, cargo-bay, cryogenic-plant]
+  size: [4, 4]

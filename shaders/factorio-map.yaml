@@ -1,0 +1,113 @@
+padding: "10%"
+aspect-ratio: "16:9"
+aspect-adjustment: "expand"
+
+general:
+# Tiles
+  - names: [water]
+    color: "#31515A"
+  - names: [deepwater]
+    color: "#21414A"
+
+  - names: [concrete, stone-path]
+    func: IN
+    color: "#313129"
+  - names: [landfill]
+    color: "#3A2419"
+
+  - names: [sand]
+    func: IN
+    color: "#8C653A"
+
+  - names: [red-desert-0]
+    color: "#634521"
+  - names: [red-desert-1]
+    color: "#735121"
+  - names: [red-desert-2]
+    color: "#735529"
+  
+  - names: [grass-1]
+    color: "#313508"
+  - names: [grass-2]
+    color: "#423908"
+  - names: [grass-3]
+    color: "#423519"
+  - names: [grass-4]
+    color: "#3A2810"
+
+  - names: [dirt-3]
+    color: "#845D31"
+  - names: [dirt-4]
+    color: "#634929"
+  - names: [dirt-5]
+    color: "#5A3D21"
+  - names: [dirt-6]
+    color: "#523519"
+  - names: [dirt-7]
+    color: "#3A2810"
+
+  # Fulgora
+  - names: [oil-ocean-deep]
+    color: "#3A191E"
+  - names: [oil-ocean-shallow]
+    color: "#471E1E"
+  # - names: ["fulgoran-machinery"]
+  #   color: "#0A4773"
+
+  # Vulcanus
+  - names: [lava]
+    color: "#FF8937"
+  - names: [lava-hot]
+    color: "#A32816"
+  - names: [volcanic-folds-warm]
+    color: "#482925"
+  - names: [volcanic-folds]
+    color: "#2D2525"
+  - names: [volcanic-soil-dark]
+    color: "#362E25"
+
+# Entities
+  # Ores and resources
+  - names: [copper-ore]
+    color: "#7B3A1E"
+  - names: [coal]
+    color: "#040301"
+  - names: [iron-ore]
+    color: "#008cff"
+  - names: [uranium-ore]
+    color: "#00B200"
+  - names: [crude-oil]
+    color: "#00001e"
+  - names: [scrap]
+    color: "#999999"
+
+  # Land features
+  - names: [tree, trunk]
+    func: IN
+    color: "#31501B"
+  - names: [cliff]
+    func: IN
+    color: "#84563D"
+
+  # Engineer made
+  - names: [assembling-machine, inserter]
+    func: IN
+    color: "#15688C"
+  - names: [belt, splitter, underground]
+    func: IN
+    color: "#CEA242"
+  - names: [rail]
+    func: IN
+    color: "#8C8E8C"
+  - names: [roboport]
+    color: "#BCA26C"
+  - names: [electric-pole, pipe]
+    func: IN
+    color: "#103950"
+  - names: [steam-turbine, radar, lab]
+    color: "#007DA4"
+  - names: [stone-wall]
+    func: IN
+    color: "#604f38"
+  - names: [laser-turret]
+    color: "#DE2D29"

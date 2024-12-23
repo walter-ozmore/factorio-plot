@@ -1,0 +1,66 @@
+# Define a selection group to make further definitions simpler
+group:
+  machines:
+    names: [assembling-machine, chemical-plant, inserter, roboport, steam-turbine, radar, lab, electric-furnace, electric-mining-drill, pumpjack, rocket-silo, cryogenic-plant, cargo-bay]
+    func: IN
+  robots:
+    names: [construction-robot, logistics-robot]
+  short-transport:
+    names: [belt, splitter, underground, pipe]
+    func: IN
+
+# Create defaults for all images
+# defaults:
+#   - group: machines
+#     style: BORDER
+
+# Create planet specific styles
+planets:
+  vulcanus:
+    # Engineer made
+    - group: machines
+      color: "#FF8937"
+    - group: short-transport
+      color: "#A32816"
+  nauvis:
+    - group: machines
+      color: "#FFFFFF"
+    - group: short-transport
+      color: "#25aa00"
+    - names: [rail]
+      func: IN
+      color: "#445ebd"
+  fulgora:
+    # Engineer made
+    - group: machines
+      color: "#E3C800"
+    - group: short-transport
+      color: "#FA9C06"
+    - names: [rail]
+      func: IN
+      color: "#D90073"
+  aquilo: # Aquilo
+    - group: machines
+      color: "#63DEDE"
+    - group: short-transport
+      color: "#5C9592"
+    - names: [rail]
+      func: IN
+      color: "#E2E9E9"
+    - names: [dust-patchy, dust-flat, snow-flat, snow-patchy, dusk-patchy, snow-lumpy, snow-crests, ice-platform, ice-rough, ice-smooth, brash-ice]
+      func: IN
+      color: "#FFFFFF"
+    - names: [refined-concrete]
+      func: IN
+      color: "#444444"
+    - names: [frozen-refined-concrete]
+      func: IN
+      color: "#444466"
+  gleba:
+    - group: machines
+      color: "#0050EF"
+    - group: short-transport
+      color: "#AA00FF"
+    - names: [rail]
+      func: IN
+      color: "#D80073"
