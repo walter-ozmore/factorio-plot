@@ -16,4 +16,4 @@ fi
 
 # Run our python script
 clear
-python3 draw-image.py
+python3 main.py
