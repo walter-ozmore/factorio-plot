@@ -1,0 +1,12 @@
+padding: "10%"
+aspect-ratio: "16:9"
+shader: shades.yaml
+
+# An example of progress images would be "{datetime}/{planet}"
+filename: "{datetime}/{surfaceName}"
+
+auto-update-server: True # Always pull the newest server from factorio.com
+
+factorio-save-name: Space Run
+factorio-save-path: ~/.factorio/saves # Location of the save file that will be used
+backgrounds-folder: ~/Desktop # Output images will be moved to this folder, if there are matching names they will be overridden

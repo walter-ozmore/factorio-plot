@@ -501,7 +501,11 @@ jobs = [] # Stored jobs for the worker thread
 outputFiles = [] # Paths to the output images
 # config = loadConfigV1("factorio-map.yaml")
 
-with open(f'config.yaml', 'r') as f:
+# Load our general config file
+if os.path.exists('config.yaml') == False:
+	shutil.copy('config-example.yaml', 'config.yaml')
+
+with open('config.yaml', 'r') as f:
 	config = yaml.safe_load(f)
 shaderConfig = loadConfigV1(config["shader"])
 
