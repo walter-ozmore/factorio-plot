@@ -378,7 +378,7 @@ def startServer():
 
 	# Run the command and get updates from its standard output
 	print("Starting Factorio server")
-	command = ["factorio/bin/x64/factorio", "--start-server", "factorio-save/Space Age.zip", "--server-settings", "server-settings.json"]
+	command = ["factorio/bin/x64/factorio", "--start-server", "factorio-save/"+config["factorio-save-name"], "--server-settings", "server-settings.json"]
 	print(" ".join(command))
 	p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -503,7 +503,7 @@ useServer = True # Run the server to generate the map
 # Copy our save
 if "factorio-save-path" in config:
 	# Move our files
-	factorioSavePath = os.path.expanduser( config["factorio-save-path"] )
+	factorioSavePath = os.path.expanduser( config["factorio-save-path"] + "/" + config["factorio-save-name"] + ".zip" )
 	print(f"Copying our Factorio save file '{factorioSavePath}'")
 	shutil.copy(factorioSavePath, "factorio-save/")
 
