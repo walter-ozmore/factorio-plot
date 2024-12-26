@@ -524,6 +524,9 @@ useServer = True # Run the server to generate the map
 if "factorio-save-path" in config:
 	# Move our files
 	factorioSavePath = os.path.expanduser( config["factorio-save-path"] + "/" + config["factorio-save-name"] + ".zip" )
+	if os.path.exists(factorioSavePath) == False:
+		print(f"Looking for save at {factorioSavePath}\nThe save '{config['factorio-save-name']}' does not exist in the directory '{config['factorio-save-path']}'. Exiting")
+		exit()
 	print(f"Copying our Factorio save file '{factorioSavePath}'")
 	shutil.copy(factorioSavePath, "factorio-save/")
 
