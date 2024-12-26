@@ -507,6 +507,11 @@ if os.path.exists('config.yaml') == False:
 
 with open('config.yaml', 'r') as f:
 	config = yaml.safe_load(f)
+
+if "auto-generated" in config and config["auto-generated"] == True:
+	print("Please verify in config.yaml that the settings are correct. Then change auto-generated to False and run again.")
+	exit()
+
 shaderConfig = loadConfigV1(config["shader"])
 
 # Calculate time text

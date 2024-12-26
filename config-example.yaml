@@ -1,3 +1,6 @@
+# Turn this to false to run the program
+auto-generated: True
+
 padding: "10%"
 aspect-ratio: "16:9"
 shader: shades.yaml
