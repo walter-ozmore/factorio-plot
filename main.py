@@ -134,9 +134,20 @@ def drawSurface(surfaceName, localSurfaceConfig):
 	# Alter the image width and height to fit our aspect ratio
 	if "aspect-ratio" in config:
 		print("  Updating aspect ratio")
-		expectedW, expectedY = config["aspect-ratio"].split(":")
-		expectedW, expectedY = float(expectedW), float(expectedY)
-		print(f"    New ratio: ({expectedW}:{expectedY})")
+		try:
+			# Break our the ratio in to two strings
+			ratio = config["aspect-ratio"]
+			if ":" in config["aspect-ratio"]:
+				expectedW, expectedY = ratio.split(":")
+			elif "x" in config["aspect-ratio"]:
+				expectedW, expectedY = ratio.split("x")
+
+			# Make the strings into numbers
+			expectedW, expectedY = float(expectedW), float(expectedY)
+			print(f"    New ratio: ({expectedW}:{expectedY})")
+		except:
+			print(f"Error processing:'aspect-ratio: \"{ratio}\"'\tCorrect Example: 'aspect-ratio: \"16:9\"'")
+			exit()
 
 
 		# imageWidth, imageHeight = int(imageWidth), int(imageHeight)
