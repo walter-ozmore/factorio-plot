@@ -11,3 +11,9 @@ Run with `./start.sh`
 
 
 The output images' file names can be edited using `config.yaml` and the colors can be edited by the files in the shader folder
+
+# Common issues
+
+Error: `./start.sh: line 14: venv/bin/activate: No such file or directory`
+
+Solution: Delete the venv folder in the directory
