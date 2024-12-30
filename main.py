@@ -232,8 +232,6 @@ def drawSurface(surfaceName, localSurfaceConfig):
 	# Draw required draw area
 	# draw.rectangle([(x, y), (x+width, y+height)], outline="red", width=2)
 
-	# string = "{timeText}/{surfaceName}"
-	# string = "{surfaceName}"
 	string = config["filename"]
 	string = format_string(string, datetime=timeTxt, surfaceName=surfaceName)
 	imagePath = f"images/{string}.png"
@@ -516,7 +514,7 @@ shaderConfig = loadConfigV1(config["shader"])
 
 # Calculate time text
 timeObj = datetime.now()
-timeTxt = timeObj.strftime("%Y-%m-%d %H:%M:%S")
+timeTxt = timeObj.strftime("%Y-%m-%d %H:%M")
 
 useServer = True # Run the server to generate the map
 
