@@ -17,3 +17,6 @@ The output images' file names can be edited using `config.yaml` and the colors c
 Error: `./start.sh: line 14: venv/bin/activate: No such file or directory`
 
 Solution: Delete the venv folder in the directory
+
+# Shades
+The primary way to edit the style of the output image is with shader files. Shader files can be selected via `shader: shades.yaml` in `config.yaml`. All shaders must be a yaml file inside of the shaders folder.
