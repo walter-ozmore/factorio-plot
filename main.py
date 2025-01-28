@@ -523,7 +523,7 @@ if "factorio-save-path" in config:
 	# Make sure our copy dst exists
 	tmpSaveFolder = "factorio-save"
 	if not os.path.exists(tmpSaveFolder):
-		os.makedirs(directory)
+		os.makedirs(tmpSaveFolder)
 
 	# Move our files
 	factorioSavePath = os.path.expanduser( config["factorio-save-path"] + "/" + config["factorio-save-name"] + ".zip" )
