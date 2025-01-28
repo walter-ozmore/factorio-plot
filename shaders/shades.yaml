@@ -8,6 +8,9 @@ group:
   short-transport:
     names: [belt, splitter, underground, pipe]
     func: IN
+  long-transport:
+    names: [straight-rail, curved-rail-a, curved-rail-b, half-diagonal-rail]
+    func: EXACT
 
 # Create defaults for all images
 # defaults:
@@ -27,8 +30,7 @@ planets:
       color: "#FFFFFF"
     - group: short-transport
       color: "#25aa00"
-    - names: [rail]
-      func: IN
+    - group: long-transport
       color: "#445ebd"
   fulgora:
     # Engineer made
@@ -36,16 +38,14 @@ planets:
       color: "#E3C800"
     - group: short-transport
       color: "#FA9C06"
-    - names: [rail]
-      func: IN
+    - group: long-transport
       color: "#D90073"
   aquilo: # Aquilo
     - group: machines
       color: "#63DEDE"
     - group: short-transport
       color: "#5C9592"
-    - names: [rail]
-      func: IN
+    - group: long-transport
       color: "#E2E9E9"
     - names: [dust-patchy, dust-flat, snow-flat, snow-patchy, dusk-patchy, snow-lumpy, snow-crests, ice-platform, ice-rough, ice-smooth, brash-ice]
       func: IN
@@ -61,6 +61,5 @@ planets:
       color: "#0050EF"
     - group: short-transport
       color: "#AA00FF"
-    - names: [rail]
-      func: IN
+    - group: long-transport
       color: "#D80073"
