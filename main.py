@@ -1,5 +1,6 @@
 import time, json, os, yaml, statistics, math, subprocess, threading, shutil, sys, platform, requests
 import tarfile
+import hashlib
 from datetime import datetime
 from PIL import Image, ImageDraw
 
@@ -219,8 +220,9 @@ def drawSurface(surfaceName, localSurfaceConfig):
 	# Sort our names
 	unhandledNames = dict(sorted(unhandledNames.items(), key=lambda item: item[1]))
 
-	for name in unhandledNames:
-		print(f"  Unhandled entry: {name} ({unhandledNames[name]})")
+	# Print out unhandled entries
+	# for name in unhandledNames:
+	# 	print(f"  Unhandled entry: {name} ({unhandledNames[name]})")
 
 
 	# Save the image or show it
@@ -423,6 +425,12 @@ def startServer():
 	if final_error:
 		print(f"Error: {final_error.decode('utf-8')}")
 
+	# Write info about this run to the last run file
+	with open(lrFilePath, 'w') as file:
+		yaml.dump({
+			"save-hash": saveFileHash
+		}, file, default_flow_style=False)
+
 
 def workerThread():
 	while running and len(jobs) <= 0:
@@ -491,13 +499,24 @@ def updateMod():
 	shutil.copytree("custom-mod", modPath)
 
 
+def getFileHash(filePath):
+	algorithm = 'sha256'
+	func = hashlib.new(algorithm)
+	
+	with open(filePath, 'rb') as f:
+		while chunk := f.read(8192):
+			func.update(chunk)
+					
+	return func.hexdigest()
+
+
 startTime = time.time()
 
 debug = False
 running = True
 jobs = [] # Stored jobs for the worker thread
 outputFiles = [] # Paths to the output images
-# config = loadConfigV1("factorio-map.yaml")
+
 
 # Load our general config file
 if os.path.exists('config.yaml') == False:
@@ -512,11 +531,11 @@ if "auto-generated" in config and config["auto-generated"] == True:
 
 shaderConfig = loadConfigV1(config["shader"])
 
+
 # Calculate time text
 timeObj = datetime.now()
 timeTxt = timeObj.strftime("%Y-%m-%d %H:%M")
 
-useServer = True # Run the server to generate the map
 
 # Copy our save
 if "factorio-save-path" in config:
@@ -532,7 +551,20 @@ if "factorio-save-path" in config:
 		exit()
 	print(f"Copying our Factorio save file '{factorioSavePath}'")
 	shutil.copy(factorioSavePath, tmpSaveFolder+"/")
+localSavePath = f"factorio-save/{config['factorio-save-name']}.zip"
 
+
+# Check if this save has already ran (no need to fetch new)
+useServer = True # Run the server to generate the map
+lrFilePath = "lastrun.yaml"
+saveFileHash = getFileHash(localSavePath)
+if os.path.exists(lrFilePath):
+	with open(lrFilePath, 'r') as file:
+		data = yaml.safe_load(file)
+	
+	# Save file has not changed since the last run, no need for server
+	if data["save-hash"] == saveFileHash:
+		useServer = False
 
 
 # Create our images
