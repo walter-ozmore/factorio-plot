@@ -5,7 +5,7 @@ padding: "10%"
 aspect-ratio: "16:9"
 shader: shades.yaml
 
-# An example of progress images would be "{datetime}/{planet}"
+# An example of progress images would be "{datetime}/{surfaceName}"
 filename: "{datetime}/{surfaceName}"
 
 auto-update-server: True # Always pull the newest server from factorio.com
