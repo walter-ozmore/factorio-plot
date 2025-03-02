@@ -1,6 +1,7 @@
 factorio.tar.xz
 info.md
 config.yaml
+/lastrun.yaml
 
 /example-images
 /venv
