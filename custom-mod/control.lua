@@ -1,5 +1,15 @@
-function processPlanet(surface)
-	local area = {{-1000, -1000}, {1000, 1000}}
+function processPlanetChunk(surface, chunkX, chunkY)
+	local chunkSize = $$CHUNK_SIZE$$
+	local area = {
+		{
+			-chunkSize + chunkX * chunkSize,
+			-chunkSize + chunkY * chunkSize
+		},
+		{
+			chunkSize + chunkX * chunkSize,
+			chunkSize + chunkY * chunkSize
+		}
+	}
 	local entities = game.surfaces[surface].find_entities(area)
 	
 	local exportTiles = {}
@@ -39,12 +49,13 @@ function processPlanet(surface)
 	}
 
 
-	filePath = surface .. '.json'
+	filePath = string.format("%s (%d,%d).json", surface, chunkX, chunkY)
 	helpers.write_file(filePath,
 		helpers.table_to_json(data),
 		false, 0
 	)
 end
+
 
 script.on_init(function()
 	-- Your initialization code here
@@ -52,14 +63,27 @@ script.on_init(function()
 
 	-- Loop though every planet and run the process function on them
 	for planetName, planet in pairs(game.planets) do
-		processPlanet(planetName)
-		print(planetName)
+		-- processPlanetChunk(planetName, 0, 0)
+		-- print(planetName)
+		size = $$SCAN_RANGE$$ -- Set a range for us to scan via python
+		for x = -size, size, 1 do
+			for y = -size, size, 1 do
+				processPlanetChunk(planetName, x, y)
+			end
+		end
+		print(planetName) -- Print the name for python to process this planet
 	end
 
-	-- local planetName = "aquilo"
-	-- processPlanet(planetName)
+	-- local planetName = "nauvis"
+	-- size = $$SCAN_RANGE$$
+	-- for x = -size, size, 1 do
+	-- 	for y = -size, size, 1 do
+	-- 		processPlanetChunk(planetName, x, y)
+	-- 	end
+	-- end
 	-- print(planetName)
 
 	-- Crash the game
+	-- print("JOB DONE")
 	helpers.print("AHH A CRASH")
 end)

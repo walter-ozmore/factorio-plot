@@ -72,10 +72,31 @@ def drawSurface(surfaceName, localSurfaceConfig):
 	# Store unhandled names and tiles to make life easier for the localSurfaceConfig writers
 	unhandledNames = {}
 
-	# Load our surface data
+	# Load our surface data & combine
+	bigData = {
+		"entities": [],
+		"tiles": []
+	}
 	print("  Loading script export file...", end="", flush=True)
-	with open(f"factorio/script-output/{surfaceName}.json", 'r') as file:
-		data = json.load(file)
+	scriptOutput = "factorio/script-output"
+	for file in os.listdir(scriptOutput):
+		# Skip non matching
+		if file.startswith(surfaceName) == False:
+			continue
+
+		# Process matching
+		filePath = f"{scriptOutput}/{file}"
+		print(f"Processing {filePath}")
+		with open(filePath, 'r') as file:
+			data = json.load(file)
+
+			if "entities" in data:
+				bigData["entities"] += data["entities"]
+			
+			if "tiles" in data:
+				bigData["tiles"] += data["tiles"]
+	data = bigData
+			
 	print(" done.")
 
 	tileSize = 5
@@ -94,6 +115,11 @@ def drawSurface(surfaceName, localSurfaceConfig):
 			xCords.append(entry["x"])
 			yCords.append(entry["y"])
 	print(" done.")
+
+	# Check if there is things to put on the image
+	if xCords == [] or yCords == []:
+		print("Planet has nothing on it")
+		return
 
 	# Move the image center, scale and scope
 	# Get the image center
@@ -246,13 +272,23 @@ def createBackgrounds(config):
 	"""
 	Creates backgrounds for each of the planets exported with the custom mod
 	"""
+	# Get a list of the planets
+	uniqueSurfaces = []
 	for filename in os.listdir("factorio/script-output"):
+		# Omit the chunk cords
+		surfaceName = filename[0:filename.rfind(' (')]
+
+		# Only run each planet once
+		if surfaceName in uniqueSurfaces: continue
+		uniqueSurfaces.append(surfaceName)
+	
+	# Create images for each
+	for surfaceName in uniqueSurfaces:
 		startTime = time.time()
 
 		filename = filename[0:-5]
-		if debug and filename != "vulcanus": continue # nauvis vulcanus fulgora gleba
 		print(f"Drawing {filename}...")
-		drawSurface(filename, config)
+		drawSurface(surfaceName, config)
 
 		endTime = time.time()
 		deltaTime = endTime - startTime
@@ -380,6 +416,9 @@ def startServer():
 	Runs the Factorio server
 	"""
 	# Empty our server output
+	scriptOutputPath = "factorio/script-output"
+	if os.path.exists(scriptOutputPath):
+		shutil.rmtree(scriptOutputPath)
 
 	# Remove lock file
 	lockFilePath = "factorio/.lock"
@@ -497,6 +536,17 @@ def updateMod():
 
 	# Copy new mod
 	shutil.copytree("custom-mod", modPath)
+
+	# Add variables in to mod
+	with open(f"{modPath}/control.lua", 'r') as file:
+		contents = file.read()
+	
+	contents = contents.replace('$$CHUNK_SIZE$$', config["chunk-size"] if "chunk-size" in config else '512')
+	contents = contents.replace('$$SCAN_RANGE$$', config["scan-range"] if "scan-range" in config else '2')
+
+	with open(f"{modPath}/control.lua", 'w') as file:
+		# Write the modified contents back to the file
+		file.write(contents)
 
 
 def getFileHash(filePath):
