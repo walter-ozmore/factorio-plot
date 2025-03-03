@@ -4,40 +4,6 @@ import hashlib
 from datetime import datetime
 from PIL import Image, ImageDraw
 
-
-def match(entity, colorCode):
-	name = entity["name"]
-	func = "EXACT"
-	if "func" in colorCode:
-		func = colorCode["func"]
-	
-	# Check all names
-	for ccName in colorCode["names"]:
-		# Handle functions
-		match func:
-			case "EXACT": 
-				if name == ccName: return True
-			case "IN": 
-				if ccName in name: return True
-	return False
-
-
-def getAspect(width, height):
-	"""
-	Grabs the aspect ratio of the screen
-	"""
-	width = int(width)
-	height = int(height)
-	# Calculate the greatest common divisor of the width and height
-	gcd_value = math.gcd(width, height)
-
-	# Simplify the aspect ratio
-	aspect_ratio_width = width // gcd_value
-	aspect_ratio_height = height // gcd_value
-
-	return aspect_ratio_width, aspect_ratio_height
-
-
 def drawSurface(surfaceName, localSurfaceConfig):
 	"""
 	Draws the given surface on to an image
@@ -268,35 +234,10 @@ def drawSurface(surfaceName, localSurfaceConfig):
 	outputFiles.append(imagePath)
 
 
-def createBackgrounds(config):
+def loadShaderV1(shaderFile = None, debug = False):
 	"""
-	Creates backgrounds for each of the planets exported with the custom mod
+	Loads a shader file
 	"""
-	# Get a list of the planets
-	uniqueSurfaces = []
-	for filename in os.listdir("factorio/script-output"):
-		# Omit the chunk cords
-		surfaceName = filename[0:filename.rfind(' (')]
-
-		# Only run each planet once
-		if surfaceName in uniqueSurfaces: continue
-		uniqueSurfaces.append(surfaceName)
-	
-	# Create images for each
-	for surfaceName in uniqueSurfaces:
-		startTime = time.time()
-
-		filename = filename[0:-5]
-		print(f"Drawing {filename}...")
-		drawSurface(surfaceName, config)
-
-		endTime = time.time()
-		deltaTime = endTime - startTime
-		timeString = unixDurationToText(deltaTime)
-		print(f"Planet done in {timeString}\n")
-
-
-def loadConfigV1(shaderFile = None, debug = False):
 	def groupToSelector(groupName):
 		if groupName not in config["group"]:
 			print(f"ERROR: Group '{groupName}' was not found in '{shaderFile}'")
@@ -378,37 +319,119 @@ def loadConfigV1(shaderFile = None, debug = False):
 	return newConfig
 
 
-def unixDurationToText(unix_seconds):
+def workerThread():
 	"""
-	Converts a unix time int to a human readable string
+	Waits for jobs from the server
 	"""
-	seconds = unix_seconds
-	minutes = unix_seconds/60
-	hours = minutes/60
-	days = hours/24
-	years = days/365
+	while running and len(jobs) <= 0:
+		time.sleep(1/20)
+		if len(jobs) <= 0: continue
 
-	text = ""
-
-	if hours >= 1: text += f"{hours:<.0f} hours & "
-	if minutes >= 1 and days < 1:
-		num = (hours % 1) * 60
-		text += f"{num:<.0f} minutes & "
-	if seconds >= 1 and hours < 1:
-		num = (minutes % 1) * 60
-		text += f"{num:<.0f} seconds & "
-	return text[0:-3]
+		filename = jobs.pop(0)
+		print(f"Drawing {filename}...")
+		drawSurface(filename, shaderConfig)
 
 
-def format_string(s, **kwargs):
-	return s.format(**kwargs)
+def updateServer():
+	"""
+	Pulls the latest server from wube
+	"""
+	url = "https://factorio.com/get-download/stable/headless/linux64"  # Server download URL
+	output_path = "factorio.tar.xz"  # Server download path
+	
+	if os.path.exists(output_path):
+		lastServerUpdate = os.stat(output_path).st_mtime
+		if time.time() - lastServerUpdate < 86400:
+			return
 
 
-def mkdirs(directory_path):
-	try:
-		os.makedirs(directory_path)
-	except FileExistsError:
-		pass
+	# Download the new server
+	print("Downloading new server...")
+	response = requests.get(url) # Send a GET request to the URL
+	if response.status_code != 200: # Check if the request was successful
+		print("Response from server {url} was unsuccessfull, the server maybe old")
+		return
+		
+	# Open the output file and write the content of the response to it
+	with open(output_path, 'wb') as f:
+		f.write(response.content)
+	print(f"File downloaded successfully and saved to {output_path}")
+
+
+	# Delete the old server 
+	factorioServerPath = "factorio"
+	if os.path.exists(factorioServerPath) and os.path.isdir(factorioServerPath):
+		print("Removing old server path")
+		shutil.rmtree(factorioServerPath)
+
+	# Extract the new server
+	print("Extracting server file")
+	with tarfile.open("factorio.tar.xz", "r:xz") as tar:
+		tar.extractall(path=".")
+
+	os.mkdir("factorio/mods")
+	updateMod()
+
+	# rm -rf "factorio"
+	# newestServer=$(ls factorio-headless_linux_* | sort -V | tail -n 1)
+	# tar -xf "$newestServer"
+	# mkdir factorio/mods
+
+
+def updateMod():
+	"""
+	Copies our mod to our Factorio server and update variables based on the config
+	file
+	"""
+
+	# Delete old mod
+	modPath = "factorio/mods/CustomMod_0.0.1"
+	if os.path.exists(modPath) and os.path.isdir(modPath):
+		print("Removing old mod path")
+		shutil.rmtree(modPath)
+
+	# Copy new mod
+	shutil.copytree("custom-mod", modPath)
+
+	# Add variables in to mod
+	with open(f"{modPath}/control.lua", 'r') as file:
+		contents = file.read()
+	
+	contents = contents.replace('$$CHUNK_SIZE$$', config["chunk-size"] if "chunk-size" in config else '512')
+	contents = contents.replace('$$SCAN_RANGE$$', config["scan-range"] if "scan-range" in config else '2')
+
+	with open(f"{modPath}/control.lua", 'w') as file:
+		# Write the modified contents back to the file
+		file.write(contents)
+
+
+def createImages(config):
+	"""
+	Creates backgrounds for each of the planets exported with the custom mod using
+	a single thread 
+	"""
+	# Get a list of the planets
+	uniqueSurfaces = []
+	for filename in os.listdir("factorio/script-output"):
+		# Omit the chunk cords
+		surfaceName = filename[0:filename.rfind(' (')]
+
+		# Only run each planet once
+		if surfaceName in uniqueSurfaces: continue
+		uniqueSurfaces.append(surfaceName)
+	
+	# Create images for each
+	for surfaceName in uniqueSurfaces:
+		startTime = time.time()
+
+		filename = filename[0:-5]
+		print(f"Drawing {filename}...")
+		drawSurface(surfaceName, config)
+
+		endTime = time.time()
+		deltaTime = endTime - startTime
+		timeString = unixDurationToText(deltaTime)
+		print(f"Planet done in {timeString}\n")
 
 
 def startServer():
@@ -471,82 +494,71 @@ def startServer():
 		}, file, default_flow_style=False)
 
 
-def workerThread():
-	while running and len(jobs) <= 0:
-		time.sleep(1/20)
-		if len(jobs) <= 0: continue
-
-		filename = jobs.pop(0)
-		print(f"Drawing {filename}...")
-		drawSurface(filename, shaderConfig)
+""" UTILITY FUNCTIONS """
+def format_string(s, **kwargs):
+	return s.format(**kwargs)
 
 
-def updateServer():
+def mkdirs(directory_path):
+	try:
+		os.makedirs(directory_path)
+	except FileExistsError:
+		pass
+
+
+def unixDurationToText(unix_seconds):
 	"""
-	Pulls the latest server from wube
+	Converts a unix time int to a human readable string
 	"""
-	url = "https://factorio.com/get-download/stable/headless/linux64"  # Server download URL
-	output_path = "factorio.tar.xz"  # Server download path
+	seconds = unix_seconds
+	minutes = unix_seconds/60
+	hours = minutes/60
+	days = hours/24
+	years = days/365
+
+	text = ""
+
+	if hours >= 1: text += f"{hours:<.0f} hours & "
+	if minutes >= 1 and days < 1:
+		num = (hours % 1) * 60
+		text += f"{num:<.0f} minutes & "
+	if seconds >= 1 and hours < 1:
+		num = (minutes % 1) * 60
+		text += f"{num:<.0f} seconds & "
+	return text[0:-3]
+
+
+def match(entity, colorCode):
+	name = entity["name"]
+	func = "EXACT"
+	if "func" in colorCode:
+		func = colorCode["func"]
 	
-	if os.path.exists(output_path):
-		lastServerUpdate = os.stat(output_path).st_mtime
-		if time.time() - lastServerUpdate < 86400:
-			return
+	# Check all names
+	for ccName in colorCode["names"]:
+		# Handle functions
+		match func:
+			case "EXACT": 
+				if name == ccName: return True
+			case "IN": 
+				if ccName in name: return True
+	return False
 
 
-	# Download the new server
-	print("Downloading new server...")
-	response = requests.get(url) # Send a GET request to the URL
-	if response.status_code != 200: # Check if the request was successful
-		print("Response from server {url} was unsuccessfull, the server maybe old")
-		return
-		
-	# Open the output file and write the content of the response to it
-	with open(output_path, 'wb') as f:
-		f.write(response.content)
-	print(f"File downloaded successfully and saved to {output_path}")
+def getAspect(width, height):
+	"""
+	Grabs the aspect ratio of the screen
+	"""
+	width = int(width)
+	height = int(height)
+	# Calculate the greatest common divisor of the width and height
+	gcd_value = math.gcd(width, height)
 
+	# Simplify the aspect ratio
+	aspect_ratio_width = width // gcd_value
+	aspect_ratio_height = height // gcd_value
 
-	# Delete the old server 
-	factorioServerPath = "factorio"
-	if os.path.exists(factorioServerPath) and os.path.isdir(factorioServerPath):
-		print("Removing old server path")
-		shutil.rmtree(factorioServerPath)
-
-	# Extract the new server
-	print("Extracting server file")
-	with tarfile.open("factorio.tar.xz", "r:xz") as tar:
-		tar.extractall(path=".")
-
-	os.mkdir("factorio/mods")
-	updateMod()
-
-	# rm -rf "factorio"
-	# newestServer=$(ls factorio-headless_linux_* | sort -V | tail -n 1)
-	# tar -xf "$newestServer"
-	# mkdir factorio/mods
-
-
-def updateMod():
-	# Delete old mod
-	modPath = "factorio/mods/CustomMod_0.0.1"
-	if os.path.exists(modPath) and os.path.isdir(modPath):
-		print("Removing old mod path")
-		shutil.rmtree(modPath)
-
-	# Copy new mod
-	shutil.copytree("custom-mod", modPath)
-
-	# Add variables in to mod
-	with open(f"{modPath}/control.lua", 'r') as file:
-		contents = file.read()
-	
-	contents = contents.replace('$$CHUNK_SIZE$$', config["chunk-size"] if "chunk-size" in config else '512')
-	contents = contents.replace('$$SCAN_RANGE$$', config["scan-range"] if "scan-range" in config else '2')
-
-	with open(f"{modPath}/control.lua", 'w') as file:
-		# Write the modified contents back to the file
-		file.write(contents)
+	return aspect_ratio_width, aspect_ratio_height
 
 
 def getFileHash(filePath):
@@ -560,6 +572,8 @@ def getFileHash(filePath):
 	return func.hexdigest()
 
 
+
+""" MAIN ENTRY """
 startTime = time.time()
 
 debug = False
@@ -579,7 +593,7 @@ if "auto-generated" in config and config["auto-generated"] == True:
 	print("Please verify in config.yaml that the settings are correct. Then change auto-generated to False and run again.")
 	exit()
 
-shaderConfig = loadConfigV1(config["shader"])
+shaderConfig = loadShaderV1(config["shader"])
 
 
 # Calculate time text
@@ -632,7 +646,7 @@ if useServer:
 	running = False # Signal the worker thread to stop
 	workerThread.join()
 else:
-	createBackgrounds(shaderConfig)
+	createImages(shaderConfig)
 
 
 
