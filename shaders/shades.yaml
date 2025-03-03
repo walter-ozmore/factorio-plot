@@ -1,16 +1,24 @@
 # Define a selection group to make further definitions simpler
 group:
   machines:
-    names: [assembling-machine, chemical-plant, inserter, roboport, steam-turbine, radar, lab, electric-furnace, electric-mining-drill, pumpjack, rocket-silo, cryogenic-plant, cargo-bay]
     func: IN
+    names: [assembling-machine, chemical-plant, inserter, roboport, steam-turbine, radar, lab, electric-furnace, electric-mining-drill, pumpjack, rocket-silo, cryogenic-plant, cargo-bay]
   robots:
     names: [construction-robot, logistics-robot]
   short-transport:
-    names: [belt, splitter, underground, pipe]
     func: IN
+    names: [belt, splitter, underground, pipe]
   long-transport:
-    names: [straight-rail, curved-rail-a, curved-rail-b, half-diagonal-rail]
     func: EXACT
+    names: 
+      - straight-rail
+      - curved-rail-a
+      - curved-rail-b
+      - half-diagonal-rail
+      - elevated-half-diagonal-rail
+      - elevated-straight-rail
+      - elevated-curved-rail-a
+      - elevated-curved-rail-b
 
 # Create defaults for all images
 # defaults:
@@ -20,11 +28,12 @@ group:
 # Create planet specific styles
 planets:
   vulcanus:
-    # Engineer made
     - group: machines
       color: "#FF8937"
     - group: short-transport
       color: "#A32816"
+    - group: long-transport
+      color: "#df8117"
   nauvis:
     - group: machines
       color: "#FFFFFF"
@@ -33,14 +42,13 @@ planets:
     - group: long-transport
       color: "#445ebd"
   fulgora:
-    # Engineer made
     - group: machines
       color: "#E3C800"
     - group: short-transport
       color: "#FA9C06"
     - group: long-transport
       color: "#D90073"
-  aquilo: # Aquilo
+  aquilo:
     - group: machines
       color: "#63DEDE"
     - group: short-transport
