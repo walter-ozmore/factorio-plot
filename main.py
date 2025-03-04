@@ -3,6 +3,35 @@ import tarfile
 import hashlib
 from datetime import datetime
 from PIL import Image, ImageDraw
+import time
+
+class LoadingManager:
+	def __init__(self, text):
+		self.text = text
+		self.isLoading = False
+		self.index = 0
+		self.loadingChars = ["-", "\\", "|", "/"]
+		self.thread = None
+		self.start()
+
+	def worker(self):
+		while self.isLoading:
+			print(f"\r{self.text}{self.loadingChars[self.index]}", end="", flush=True)
+			self.index += 1
+			time.sleep(.1)
+			if self.index > len(self.loadingChars) - 1:
+				self.index = 0
+		print(f"\r{self.text} done.")
+	
+	def start(self):
+		self.isLoading = True
+
+		self.thread = threading.Thread(target=self.worker, daemon=True)
+		self.thread.start()
+	
+	def stop(self):
+		self.isLoading = False
+		self.thread.join()
 
 def drawSurface(surfaceName, localSurfaceConfig):
 	"""
@@ -35,6 +64,8 @@ def drawSurface(surfaceName, localSurfaceConfig):
 			case "solid": draw.rectangle(cords, fill=color, outline=color)
 			case "outline": draw.rectangle(cords, outline=color, width=2)
 
+	print(f"Drawing surface {surfaceName}...")
+
 	# Store unhandled names and tiles to make life easier for the localSurfaceConfig writers
 	unhandledNames = {}
 
@@ -52,7 +83,7 @@ def drawSurface(surfaceName, localSurfaceConfig):
 
 		# Process matching
 		filePath = f"{scriptOutput}/{file}"
-		print(f"Processing {filePath}")
+		# print(f"Processing {filePath}")
 		with open(filePath, 'r') as file:
 			data = json.load(file)
 
@@ -71,7 +102,7 @@ def drawSurface(surfaceName, localSurfaceConfig):
 	imageHeight = tileSize * int(2000/2) # Default size
 
 	# Grab all of the cords for use in image center, scale and scope
-	print("  Finding scope of file...", end="", flush=True)
+	print("  Finding scope of surface...", end="", flush=True)
 	xCords, yCords = [], []
 	for entry in data["entities"]:
 		for localSurfaceConfigEntry in localSurfaceConfig["entries"]:
@@ -95,14 +126,14 @@ def drawSurface(surfaceName, localSurfaceConfig):
 	imageCenterY = (maxy+miny) / 2
 
 	# Get the image bounds
-	print(f"  Image Center: ({imageCenterX}, {imageCenterY})")
+	# print(f"  Image Center: ({imageCenterX}, {imageCenterY})")
 
 	# Find the min and max of our image
 	tileWidth  = abs(minx) + abs(maxx)
 	tileHeight = abs(miny) + abs(maxy)
 
-	print(f"  X RANGE: ({minx}, {maxx})")
-	print(f"  Y RANGE: ({miny}, {maxy})")
+	# print(f"  X RANGE: ({minx}, {maxx})")
+	# print(f"  Y RANGE: ({miny}, {maxy})")
 
 	tileWidth  = int(tileWidth )
 	tileHeight = int(tileHeight)
@@ -142,7 +173,7 @@ def drawSurface(surfaceName, localSurfaceConfig):
 
 	# Alter the image width and height to fit our aspect ratio
 	if "aspect-ratio" in config:
-		print("  Updating aspect ratio")
+		# print("  Updating aspect ratio")
 		try:
 			# Break our the ratio in to two strings
 			ratio = config["aspect-ratio"]
@@ -153,14 +184,14 @@ def drawSurface(surfaceName, localSurfaceConfig):
 
 			# Make the strings into numbers
 			expectedW, expectedY = float(expectedW), float(expectedY)
-			print(f"    New ratio: ({expectedW}:{expectedY})")
+			# print(f"    New ratio: ({expectedW}:{expectedY})")
 		except:
 			print(f"Error processing:'aspect-ratio: \"{ratio}\"'\tCorrect Example: 'aspect-ratio: \"16:9\"'")
 			exit()
 
 
 		# imageWidth, imageHeight = int(imageWidth), int(imageHeight)
-		print(f"    Current image size: ({imageWidth}:{imageHeight})")
+		# print(f"    Current image size: ({imageWidth}:{imageHeight})")
 		w, h = getAspect(imageWidth, imageHeight)
 		if w != expectedW and h != expectedY:
 			# Create two options
@@ -169,7 +200,7 @@ def drawSurface(surfaceName, localSurfaceConfig):
 
 			if newWidth  > imageWidth : imageWidth  = newWidth
 			if newHeight > imageHeight: imageHeight = newHeight
-		print(f"    New image size: ({imageWidth}:{imageHeight})")
+		# print(f"    New image size: ({imageWidth}:{imageHeight})")
 
 	# Create our image
 	backgroundColor = (0, 0, 0, 0)
@@ -184,7 +215,7 @@ def drawSurface(surfaceName, localSurfaceConfig):
 
 	# Draw entities to our image
 	drawCount = 0
-	print(f"  Drawing image...", end="", flush=True)
+	lm = LoadingManager("  Drawing image...")
 	for entry in entries:
 		name = entry["name"]
 
@@ -221,7 +252,9 @@ def drawSurface(surfaceName, localSurfaceConfig):
 		# print(f"DRAW {name} Location: ({size[0]}, {size[1]}) Color: {color} Size: {size} Style: {style}")
 		drawRect(entry["x"], entry["y"], size[0], size[1], color=color, style=style)
 		drawCount += 1
-	print(f" done. Draw Count: {drawCount}")
+		lm.text = f"  Drawing image {drawCount}..."
+
+	lm.stop()
 
 
 
@@ -248,6 +281,7 @@ def drawSurface(surfaceName, localSurfaceConfig):
 	mkdirs( os.path.dirname(imagePath) ) # Make the folders
 	image.save(imagePath)  # To save the image as a file
 	outputFiles.append(imagePath)
+	print(f"  Surface image saved to {imagePath}")
 
 
 def loadShaderV1(shaderFile = None, debug = False):
@@ -344,7 +378,6 @@ def workerThread():
 		if len(jobs) <= 0: continue
 
 		filename = jobs.pop(0)
-		print(f"Drawing {filename}...")
 		drawSurface(filename, shaderConfig)
 
 
@@ -413,8 +446,8 @@ def updateMod():
 	with open(f"{modPath}/control.lua", 'r') as file:
 		contents = file.read()
 	
-	contents = contents.replace('$$CHUNK_SIZE$$', config["chunk-size"] if "chunk-size" in config else '512')
-	contents = contents.replace('$$SCAN_RANGE$$', config["scan-range"] if "scan-range" in config else '2')
+	contents = contents.replace('$$CHUNK_SIZE$$', str(config["chunk-size"]) if "chunk-size" in config else '512')
+	contents = contents.replace('$$SCAN_RANGE$$', str(config["scan-range"]) if "scan-range" in config else '2')
 
 	with open(f"{modPath}/control.lua", 'w') as file:
 		# Write the modified contents back to the file
@@ -441,7 +474,6 @@ def createImages(config):
 		startTime = time.time()
 
 		filename = filename[0:-5]
-		print(f"Drawing {filename}...")
 		drawSurface(surfaceName, config)
 
 		endTime = time.time()
@@ -468,7 +500,7 @@ def startServer():
 	# Run the command and get updates from its standard output
 	print("Starting Factorio server")
 	command = ["factorio/bin/x64/factorio", "--start-server", "factorio-save/"+config["factorio-save-name"], "--server-settings", "server-settings.json"]
-	print(" ".join(command))
+	# print(" ".join(command)) # Print out the command used to run the server
 	p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 	totalOutput = ""
@@ -494,7 +526,7 @@ def startServer():
 			totalOutput = totalOutput[totalOutput.index("\n")+2:]
 			if "Error ServerMultiplayerManager.cpp" in line: break
 			if modIndicator not in line and len(line.strip()) > 0:
-				print(f"Line: {line}")
+				# print(f"Line: {line}")
 				jobs.append(line)
 
 	# Wait for the command to finish and get its final standard error
@@ -648,6 +680,7 @@ if os.path.exists(lrFilePath):
 
 
 # Create our images
+print()
 if useServer:
 	updateMod()
 	updateServer()
