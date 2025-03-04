@@ -114,13 +114,29 @@ def drawSurface(surfaceName, localSurfaceConfig):
 	imageHeight = imageAreaHeight
 
 	# Grab the padding
-	padding ="10%"
-	if "%" in padding:
-		padding = padding[0:-1]
-		mult = 1+(float(padding) / 100)
-		imageWidth *= mult
-		imageHeight *= mult
+	hasError = False
+	try:
+		padding = config["padding"]
+		
+		if "%" in padding:
+			padding = padding[0:-1]
+			mult = 1+(float(padding) / 100)
+			imageWidth *= mult
+			imageHeight *= mult
+		elif "px" in padding:
+			padding = float(padding[0:-2])
+			imageWidth += padding
+			imageHeight += padding
+		else:
+			hasError = True
+	except:
+		hasError = True
 
+	if hasError:
+		print(f"ERROR: Unknown padding format: {padding}. Try 10% or 10px next time.")
+
+
+	# Merge tiles and entities in to one array
 	entries = data["tiles"] + data["entities"]
 	del data
 
