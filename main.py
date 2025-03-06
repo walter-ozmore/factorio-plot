@@ -415,16 +415,11 @@ def updateServer():
 
 	# Extract the new server
 	print("Extracting server file")
-	with tarfile.open("factorio.tar.xz", "r:xz") as tar:
-		tar.extractall(path=".")
+	with tarfile.open("factorio.tar.xz", "r") as tar:
+		tar.extractall(path=".", filter='fully_trusted')
 
 	os.mkdir("factorio/mods")
 	updateMod()
-
-	# rm -rf "factorio"
-	# newestServer=$(ls factorio-headless_linux_* | sort -V | tail -n 1)
-	# tar -xf "$newestServer"
-	# mkdir factorio/mods
 
 
 def updateMod():
