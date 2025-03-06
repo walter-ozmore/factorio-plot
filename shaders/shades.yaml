@@ -4,6 +4,7 @@ group:
     func: IN
     names: [assembling-machine, chemical-plant, inserter, roboport, steam-turbine, radar, lab, electric-furnace, electric-mining-drill, pumpjack, rocket-silo, cryogenic-plant, cargo-bay]
   robots:
+    func: EXACT
     names: [construction-robot, logistics-robot]
   short-transport:
     func: IN
@@ -41,6 +42,11 @@ planets:
       color: "#25aa00"
     - group: long-transport
       color: "#445ebd"
+    - names: [stone-wall]
+      func: EXACT
+      color: "#038800"
+    - group: robots
+      color: "#FFFFFF"
   fulgora:
     - group: machines
       color: "#E3C800"
