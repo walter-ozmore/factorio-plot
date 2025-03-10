@@ -282,6 +282,7 @@ def drawSurface(surfaceName, localSurfaceConfig):
 	image.save(imagePath)  # To save the image as a file
 	outputFiles.append(imagePath)
 	print(f"  Surface image saved to {imagePath}")
+	print()
 
 
 def loadShaderV1(shaderFile = None, debug = False):
@@ -385,17 +386,19 @@ def updateServer():
 	"""
 	Pulls the latest server from wube
 	"""
+	print("Checking server...")
 	url = "https://factorio.com/get-download/stable/headless/linux64"  # Server download URL
 	output_path = "factorio.tar.xz"  # Server download path
 	
 	if os.path.exists(output_path):
 		lastServerUpdate = os.stat(output_path).st_mtime
 		if time.time() - lastServerUpdate < 86400:
+			print("  Server is up to date\n")
 			return
 
 
 	# Download the new server
-	print("Downloading new server...")
+	lm = LoadingManager("  Downloading new server...")
 	response = requests.get(url) # Send a GET request to the URL
 	if response.status_code != 200: # Check if the request was successful
 		print("Response from server {url} was unsuccessfull, the server maybe old")
@@ -404,22 +407,27 @@ def updateServer():
 	# Open the output file and write the content of the response to it
 	with open(output_path, 'wb') as f:
 		f.write(response.content)
-	print(f"File downloaded successfully and saved to {output_path}")
-
+	lm.stop()
 
 	# Delete the old server 
 	factorioServerPath = "factorio"
 	if os.path.exists(factorioServerPath) and os.path.isdir(factorioServerPath):
-		print("Removing old server path")
+		print("  Removing old server path...", end="", flush=True)
 		shutil.rmtree(factorioServerPath)
+		print(" done.")
 
 	# Extract the new server
-	print("Extracting server file")
+	lm = LoadingManager("  Extracting server file...")
 	with tarfile.open("factorio.tar.xz", "r") as tar:
 		tar.extractall(path=".", filter='fully_trusted')
+	lm.stop()
 
+	print("  Moving mod...", end="", flush=True)
 	os.mkdir("factorio/mods")
 	updateMod()
+	print(" done.")
+
+	print() # Func done
 
 
 def updateMod():
@@ -431,7 +439,6 @@ def updateMod():
 	# Delete old mod
 	modPath = "factorio/mods/CustomMod_0.0.1"
 	if os.path.exists(modPath) and os.path.isdir(modPath):
-		print("Removing old mod path")
 		shutil.rmtree(modPath)
 
 	# Copy new mod
@@ -493,7 +500,8 @@ def startServer():
 		os.remove(lockFilePath)
 
 	# Run the command and get updates from its standard output
-	print("Starting Factorio server")
+	# print("Starting Factorio server")
+	lm = LoadingManager("Starting Factorio server...")
 	command = ["factorio/bin/x64/factorio", "--start-server", "factorio-save/"+config["factorio-save-name"], "--server-settings", "server-settings.json"]
 	# print(" ".join(command)) # Print out the command used to run the server
 	p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -515,6 +523,8 @@ def startServer():
 		if modIndicator in totalOutput:
 			totalOutput = totalOutput[totalOutput.index(modIndicator)+len(modIndicator)+2:]
 			flagModLines = True
+			lm.stop()
+			print("Waiting for server to finish collecting data...\n")
 		
 		if flagModLines and "\n" in totalOutput:
 			line = totalOutput[0:totalOutput.index("\n")]
