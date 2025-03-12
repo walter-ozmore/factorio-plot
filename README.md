@@ -1,18 +1,19 @@
 # Factorio Map Creator
 A tool for turning Factorio maps in to pictures. Allows you to configure custom image ratios, colors, included structures, etc. Currently only compatiable with Linux due to the server files.
 
-**Does not currently do ships**
+**Does not currently do ships.**
 
 Inspired by [Drawscape Factorio](https://github.com/drawscape-labs/drawscape-factorio).
 
 # Installation
-1. Download the repo from GitHub `wget https://github.com/walter-ozmore/factorio-plot/archive/refs/heads/main.zip -O factorio-plot`
-2. Unzip the repo and navigate to it `unzip factorio-plot && cd factorio-plot-main`
-3. Run the sh file `./start.sh`
+1. Download the repo from GitHub `wget https://github.com/walter-ozmore/factorio-plot/archive/refs/heads/main.zip -O factorio-plot`.
+2. Unzip the repo and navigate to it `unzip factorio-plot && cd factorio-plot-main`.
+3. Run the sh file `./start.sh`.
 
 # Common issues
 __Error__
 `./start.sh: line 14: venv/bin/activate: No such file or directory`
+<br/>
 __Solution__
 Delete the `venv` folder in the directory.
 
@@ -22,31 +23,31 @@ The customization is done using the `config.yaml` and a shaders `.yaml` file. Pl
 ## config.yaml
 The `config.yaml` file allows you to edit to edit all of the below details.
 
-__aspect-ratio__ **required**
+<ins>aspect-ratio</ins> **required**<br\>
 The desired aspect ratio for the generated images. Can be any number, including decibles. In this format: `width:height`.
 
-__padding__
+<ins>padding</ins><br\>
 Can be set to either px or %, and any numerical value is valid.
 
-__shader__ **required**
+<ins>shader</ins> **required**<br\>
 Lets you select your desired shader file. This project provides several defaults to pick from, or you can make your own. See more in the shader.yaml section below.
 
-__filename__ **required**
+<ins>filename</ins> **required**<br\>
 The name format for the generated images. You can use `{datetime}` and `{surfaceName}`. This acts as creating a path, so you will want to avoid slashes unless you are wanting them stored in a folder.
 
-__auto-update-server__ **required**
+<ins>auto-update-server</ins> **required**<br\>
 When set to true, it will automatically download the newest Factorio server from their website and will use it to create the files. This is primarily for if someone is using an older version of Factorio and is unable to update.
 
-__factorio-save-name__ **required**
+<ins>factorio-save-name</ins> **required**<br\>
 Name of the Factorio save in the save path directory. You do not need to include the `.zip`.
 
-__factorio-save-path__ **required**
+<ins>factorio-save-path</ins> **required**<br\>
 The location of the save file.
 
-__backgrounds-folder__
+<ins>backgrounds-folder</ins><br\>
 Where the files are moved to if you do not want them to be in the default `images` folder.
 
-__auto-generated__
+<ins>auto-generated</ins><br\>
 A flag to show whether or not you want the script's tutorial messages.
 
 ## Shaders
