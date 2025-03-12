@@ -23,31 +23,31 @@ The customization is done using the `config.yaml` and a shaders `.yaml` file. Pl
 ## config.yaml
 The `config.yaml` file allows you to edit to edit all of the below details.
 
-<ins>aspect-ratio</ins> **required**<br\>
+<ins>aspect-ratio</ins> **required**<br/>
 The desired aspect ratio for the generated images. Can be any number, including decibles. In this format: `width:height`.
 
-<ins>padding</ins><br\>
+<ins>padding</ins><br/>
 Can be set to either px or %, and any numerical value is valid.
 
-<ins>shader</ins> **required**<br\>
+<ins>shader</ins> **required**<br/>
 Lets you select your desired shader file. This project provides several defaults to pick from, or you can make your own. See more in the shader.yaml section below.
 
-<ins>filename</ins> **required**<br\>
+<ins>filename</ins> **required**<br/>
 The name format for the generated images. You can use `{datetime}` and `{surfaceName}`. This acts as creating a path, so you will want to avoid slashes unless you are wanting them stored in a folder.
 
-<ins>auto-update-server</ins> **required**<br\>
+<ins>auto-update-server</ins> **required**<br/>
 When set to true, it will automatically download the newest Factorio server from their website and will use it to create the files. This is primarily for if someone is using an older version of Factorio and is unable to update.
 
-<ins>factorio-save-name</ins> **required**<br\>
+<ins>factorio-save-name</ins> **required**<br/>
 Name of the Factorio save in the save path directory. You do not need to include the `.zip`.
 
-<ins>factorio-save-path</ins> **required**<br\>
+<ins>factorio-save-path</ins> **required**<br/>
 The location of the save file.
 
-<ins>backgrounds-folder</ins><br\>
+<ins>backgrounds-folder</ins><br/>
 Where the files are moved to if you do not want them to be in the default `images` folder.
 
-<ins>auto-generated</ins><br\>
+<ins>auto-generated</ins><br/>
 A flag to show whether or not you want the script's tutorial messages.
 
 ## Shaders
