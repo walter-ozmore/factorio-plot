@@ -2,22 +2,22 @@
 # Ex: Roboports being 4x4
 
 - names: 
-   - belt
-   - splitter
-   - underground
+    - belt
+    - splitter
+    - underground
   func: IN
   flags: ["center"]
 
 - names: 
-   - rail
-   - stone-furnace
-   - steel-furnace
-   - recycler
-   - beacon
-   - cliff
-   - big-electric-pole
-   - substation
-   - cargo-bay
+    - rail
+    - stone-furnace
+    - steel-furnace
+    - recycler
+    - beacon
+    - cliff
+    - big-electric-pole
+    - substation
+    - cargo-bay
   func: IN
   size: [2, 2]
 
@@ -30,24 +30,28 @@
     - pumpjack
     - centrifuge
     - electromagnetic-plant
+    - steam-turbine
   func: IN
   size: [3, 3]
   flags: ["center"]
 
 - names: 
-   - roboport
-   - cargo-bay
-   - cryogenic-plant
-   - space-platform-hub
+    - roboport
+    - cargo-bay
+    - cryogenic-plant
+    - space-platform-hub
+  func: IN
   size: [4, 4]
 
 - names: 
-   - big-mining-drill
-   - oil-refinery
-   - biolab
-   - foundry
+    - big-mining-drill
+    - oil-refinery
+    - biolab
+    - foundry
+  func: IN
   size: [5, 5]
 
 - names:
-   - rocket-silo
+    - rocket-silo
+  func: IN
   size: [9, 9]
