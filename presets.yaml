@@ -18,6 +18,7 @@
     - big-electric-pole
     - substation
     - cargo-bay
+    - laser-turret
   func: IN
   size: [2, 2]
 
