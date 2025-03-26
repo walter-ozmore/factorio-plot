@@ -35,6 +35,10 @@ general:
   - names: [grass-4]
     color: "#3A2810"
 
+  - names: [dirt-1]
+    color: "#845D31"
+  - names: [dirt-2]
+    color: "#8C613A"
   - names: [dirt-3]
     color: "#845D31"
   - names: [dirt-4]
@@ -45,6 +49,9 @@ general:
     color: "#523519"
   - names: [dirt-7]
     color: "#3A2810"
+  - names: [dry-dirt]
+    color: "#5A4121"
+
 
   # Fulgora
   - names: [oil-ocean-deep]
@@ -56,15 +63,27 @@ general:
 
   # Vulcanus
   - names: [lava]
-    color: "#FF8937"
-  - names: [lava-hot]
     color: "#A32816"
+  - names: [lava-hot]
+    color: "#FF8937"
   - names: [volcanic-folds-warm]
     color: "#482925"
   - names: [volcanic-folds]
     color: "#2D2525"
   - names: [volcanic-soil-dark]
     color: "#362E25"
+  - names: [volcanic-smooth-stone]
+    color: "#362E37"
+  - names: [volcanic-ash-dark]
+    color: "#362F27"
+  - names: [volcanic-folds-flat]
+    color: "#362E25"
+  - names: [volcanic-soil-light]
+    color: "#3F2E25"
+  - names: [volcanic-cracks-warm]
+    color: "#3F1E18"
+  - names: [volcanic-ash-soil]
+    color: "#FFFFFF"
 
 # Entities
   # Ores and resources
@@ -108,6 +127,8 @@ general:
     color: "#007DA4"
   - names: [stone-wall]
     func: IN
-    color: "#604f38"
+    color: "#CEDBCE"
   - names: [laser-turret]
     color: "#DE2D29"
+  - names: [pumpjack]
+    color: "#C531C5"
